@@ -4,7 +4,7 @@
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
 short int sp, pc; //16 bit stack pointer, program counter
-unsigned char memory[640000]; //64kilobytes of memory, each bank is 1 byte
+unsigned char memory[8192]; //64kilobytes of memory, each bank is 1 byte
 //unsigned char *memory; //64kilobytes of memory, each bank is 1 byte
 
 //PSW
@@ -370,6 +370,8 @@ void emulateCycle(){
 		//Carry flag
 		if (A > (0xFFFF - opcode[1]))
 			CY = 1;
+		else
+			CY = 0;
 		A = A + opcode[1];
 		//Zero flag
 		if (A == 0)
@@ -488,8 +490,24 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0xf5) : //PUSH PSW TODO
+	case(0xf5) : //PUSH PSW
 		//(sp-2)<-flags; (sp-1)<-A; sp <- sp - 2
+		//memory[sp-2] = FLAGS
+		unsigned int psw;
+		psw = 0x02;
+		if (S == 1)
+			psw += 0x80;
+		if (Z == 1)
+			psw += 0x40;
+		if (AC == 1)
+			psw += 0x10;
+		if (P == 1)
+			psw += 0x04;
+		if (CY == 1)
+			psw += 0x01;
+		memory[sp - 2] = psw;
+		memory[sp - 1] = A;
+		sp = sp - 2;
 		pc += 1;
 		break;
 
@@ -498,9 +516,33 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0xfe) : //CPI D8 TODO
+	case(0xfe) : //CPI D8
 		//A - data
-		pc += 1;
+		char unsigned res;
+		//Carry flag
+		if (A > (0xFFFF - opcode[1]))
+			CY = 1;
+		else
+			CY = 0;
+		CY = 0; //Carry bit is reset to zero
+		res = A - opcode[1];
+		//Zero flag
+		if (res == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((res & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (res % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 2;
 		break;
 	}
 
