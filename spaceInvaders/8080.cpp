@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include<SDL.h>
 //TODO DISSASSEMBLER
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
@@ -220,7 +221,7 @@ void emulateCycle(){
 	case(0x36) : //MVI M,D8
 		//(HL) <- byte 2
 		//short int address;
-		address = H << 8 | L;
+		address = (H << 8) | L;
 		memory [address]= opcode[1];
 		pc += 2;
 		break;
@@ -239,19 +240,19 @@ void emulateCycle(){
 
 	case(0x56) : //MOV D,M
 		//D <- (HL)
-		D = memory[H | (L << 8)];
+		D = memory[(H << 8) | L];
 		pc += 1;
 		break;
 
 	case(0x5e) : //MOV E,M
 		//E <- (HL)
-		E = memory[H | (L << 8)];
+		E = memory[(H << 8) | L];
 		pc += 1;
 		break;
 
 	case(0x66) : //MOV H,M
 		//H <-(HL)
-		H = memory[H | (L << 8)];
+		H = memory[(H << 8) | L];
 		pc += 1;
 		break;
 
@@ -260,9 +261,9 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0x77) : //MOV M,A
+	case(0x77) : //MOV M,A TODO ESTA MAL
 		//(HL) <- A
-		memory[H | (L << 8)] = A;
+		memory[(H<<8) | L] = A;
 		pc += 1;
 		break;
 
@@ -282,7 +283,7 @@ void emulateCycle(){
 		break;
 
 	case(0x7e) : //MOV A,M
-		A = memory[H | (L << 8)];
+		A = memory[(H << 8) | L];
 		pc += 1;
 		break;
 
@@ -392,9 +393,9 @@ void emulateCycle(){
 		pc += 2;
 		break;
 
-	case(0xc9) : //RET LEER COMO SE HACE
+	case(0xc9) : //RET TODO
 		//PC.lo <- (sp); PC.hi<-(sp+1); SP <- SP+2
-		pc = memory[sp] | (memory[sp + 1] << 8);
+		pc = memory[sp] | memory[(sp + 1) << 8]; //MAL
 		sp += 2;
 		break;
 
@@ -548,7 +549,7 @@ void emulateCycle(){
 
 }
 
-void main(){
+int main(int argc, char* argv[]){
 	//Load ROMs
 	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.h", 0);
 	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.g", 0x800);
@@ -558,8 +559,12 @@ void main(){
 	sp = 0xf000;
 	int hugo = 0;
 	int veces = 0;
-	while (hugo == 0){ //Se rompe en el ciclo
+	while (hugo == 0){ //Se rompe antes del ciclo 1550 pero despues del 1545. creo que en 1547
 		emulateCycle();
 		veces++;
+		if (veces == 1546){
+			printf("Hugo");
+		}
 	}
+	return 0;
 }
