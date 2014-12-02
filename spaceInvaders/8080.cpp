@@ -5,7 +5,7 @@
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
 short int sp, pc; //16 bit stack pointer, program counter
-unsigned char memory[8192]; //64kilobytes of memory, each bank is 1 byte
+unsigned char memory[81920]; //64kilobytes of memory, each bank is 1 byte creo que es 8192
 //unsigned char *memory; //64kilobytes of memory, each bank is 1 byte
 
 //PSW
@@ -28,7 +28,7 @@ void loadRom(char * file, int offset){
 	//Copy file to buffer
 	size_t result = fread(buffer, 1, size, ROM);
 	for (int i = 0; i < size; i++){
-		memory[i+offset] = buffer[i];
+		memory[i + offset] = buffer[i];
 	}
 	fclose(ROM);
 	free(buffer);
@@ -85,8 +85,8 @@ void emulateCycle(){
 		operando1 = H << 8 | L;
 		operando2 = B << 8 | C;
 		result = operando1 + operando2;
-		H = result;
-		L = result >> 8;
+		H = result >> 8;
+		L = result;
 		//Carry flag
 		if (operando1 > (0xFFFF - operando2))
 			CY = 1;
@@ -97,9 +97,9 @@ void emulateCycle(){
 		C--;
 		//Zero flag
 		if (C == 0)
-			Z = 0;
-		else
 			Z = 1;
+		else
+			Z = 0;
 		//Sign flag
 		if ((C & 0x80) == 0x80)
 			S = 1;
@@ -144,7 +144,7 @@ void emulateCycle(){
 		numero = D << 8 | E;
 		++numero;
 		E = numero;
-		D = numero >>8;
+		D = numero >> 8;
 		pc += 1;
 		break;
 
@@ -154,8 +154,8 @@ void emulateCycle(){
 		operando1 = H << 8 | L;
 		operando2 = D << 8 | E;
 		result = operando1 + operando2;
-		H = result;
-		L = result >> 8;
+		H = result >> 8;
+		L = result;
 		//Carry flag
 		if (operando1 > (0xFFFF - operando2))
 			CY = 1;
@@ -186,8 +186,8 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0x26) : //MVI H,D8
-		L = opcode[1];
+	case(0x26) : //MVI H,D8 TODO MAAAAAL
+		H = opcode[1];
 		pc += 2;
 		break;
 
@@ -196,8 +196,8 @@ void emulateCycle(){
 		short int operando1, result; //16bit number
 		operando1 = H << 8 | L;
 		result = operando1 + operando1;
-		H = result;
-		L = result >> 8;
+		H = result >> 8;
+		L = result;
 		//Carry flag
 		if (operando1 > (0xFFFF - operando1))
 			CY = 1;
@@ -222,7 +222,7 @@ void emulateCycle(){
 		//(HL) <- byte 2
 		//short int address;
 		address = (H << 8) | L;
-		memory [address]= opcode[1];
+		memory[address] = opcode[1];
 		pc += 2;
 		break;
 
@@ -263,7 +263,7 @@ void emulateCycle(){
 
 	case(0x77) : //MOV M,A TODO ESTA MAL
 		//(HL) <- A
-		memory[(H<<8) | L] = A;
+		memory[(H << 8) | L] = A;
 		pc += 1;
 		break;
 
@@ -337,13 +337,13 @@ void emulateCycle(){
 
 	case(0xc1) : //POP B
 		//C <- (sp); B <- (sp+1); sp <- sp+2
-		memory[sp] = C;
-		memory[sp + 1] = B;
+		C = memory[sp];
+		B = memory[sp + 1];
 		sp += 2;
 		pc += 1;
 		break;
 
-	case(0xc2) : //JNZ adr
+	case(0xc2) : //JNZ adr TODO MAL
 		//if NZ, PC <- adr
 		if (Z == 0)
 			pc = (opcode[1] | (opcode[2] << 8));
@@ -354,14 +354,14 @@ void emulateCycle(){
 	case(0xc3) ://JMP adr
 		//short int address;
 		//address = (opcode[1]<<4) | (opcode[2]);
-		address = (opcode[1] | opcode[2]<<8);
+		address = (opcode[1] | opcode[2] << 8);
 		pc = address;
 		break;
 
 	case(0xc5) : //PUSH B
 		//(sp-2)<-C; (sp-1)<-B; sp <- sp - 2
-		C = sp - 2;
-		B = sp - 1;
+		memory[sp - 2] = C;
+		memory[sp - 1] = B;
 		sp = sp - 2;
 		pc += 1;
 		break;
@@ -393,25 +393,28 @@ void emulateCycle(){
 		pc += 2;
 		break;
 
-	case(0xc9) : //RET TODO
+	case(0xc9) : //RET
 		//PC.lo <- (sp); PC.hi<-(sp+1); SP <- SP+2
-		pc = memory[sp] | memory[(sp + 1) << 8]; //MAL
+		pc = memory[(sp + 1)] << 8 | memory[sp];
 		sp += 2;
 		break;
 
-	case(0xcd) : //CALL adr TODO - CREO QUE ESTA SOLUCIONADO
+	case(0xcd) : //CALL - TODO MIRAR PORQUE ES ASI y sigue sin funcionar perfecto
 		//(SP-1)<-PC.hi;(SP-2)<-PC.lo;SP<-SP+2;PC=adr
-		//uint16_t    ret = state->pc+2;
-		memory[sp - 1] = pc >> 8; //MAL state->memory[state->sp-1] = (ret >> 8) & 0xff;
-		memory[sp - 2] = pc; //MAL state->memory[state->sp-2] = (ret & 0xff);
+		short int ret;
+		ret = pc + 3; //Creo que es 3 pero no estoy seguro
+		//memory[sp - 1] = pc >> 8; //MAL 
+		memory[sp - 1] = (ret >> 8) & 0xff;
+		//memory[sp - 2] = pc; //MAL 
+		memory[sp - 2] = (ret & 0xff);
 		sp = sp - 2;
 		pc = (opcode[2] << 8) | opcode[1];
 		break;
 
 	case (0xd1) : //POP D
 		//E <- (sp); D <- (sp+1); sp <- sp+2
-		memory[sp] = E;
-		memory[sp + 1] = D;
+		E = memory[sp];
+		D = memory[sp + 1];
 		sp = sp + 2;
 		pc += 1;
 		break;
@@ -421,23 +424,24 @@ void emulateCycle(){
 		pc += 2;
 		break;
 
-	case(0xd5): //PUSH D
-		E = sp - 2;
-		D = sp - 1;
+	case(0xd5) : //PUSH D
+		memory[sp - 2] = E;
+		memory[sp - 1] = D;
 		sp = sp - 2;
 		pc += 1;
 		break;
 
-	case(0xe1): //POP H
-		memory[sp] = L;
-		memory[sp + 1] = H;
+	case(0xe1) : //POP H
+		L = memory[sp];
+		H = memory[sp + 1];
 		sp = sp + 2;
 		pc += 1;
 		break;
 
-	case(0xe5): //PUSH H
-		L = sp - 2;
-		H = sp - 1;
+	case(0xe5) : //PUSH H
+		//(sp-2)<-L; (sp-1)<-H; sp <- sp - 2
+		memory[sp - 2] = L;
+		memory[sp - 1] = H;
 		sp = sp - 2;
 		pc += 1;
 		break;
@@ -559,12 +563,13 @@ int main(int argc, char* argv[]){
 	sp = 0xf000;
 	int hugo = 0;
 	int veces = 0;
-	while (hugo == 0){ //Se rompe antes del ciclo 1550 pero despues del 1545. creo que en 1547
+	while (hugo == 0){ //Falla entre 42434 falla pc creo
 		emulateCycle();
 		veces++;
-		if (veces == 1546){
+		if (veces == 42433){
 			printf("Hugo");
 		}
 	}
 	return 0;
 }
+	
