@@ -1,19 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<SDL.h>
+#include <memory.h>
+#include "SDL_endian.h"
 //TODO DISSASSEMBLER
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
 short int sp, pc; //16 bit stack pointer, program counter
-unsigned char memory[81920]; //64kilobytes of memory, each bank is 1 byte creo que es 8192
+unsigned char memory[8192*3]; //64kilobytes of memory, each bank is 1 byte creo que es 8192
 //unsigned char *memory; //64kilobytes of memory, each bank is 1 byte
 
 //PSW
+//F - Status register ... Not used
 unsigned char Z;//Zero flag
 unsigned char S;//Sign flag
 unsigned char P;//Parity flag
 unsigned char CY;//Carry flag
 unsigned char AC;//Auxiliary carry flag NOT USED IN SPACE INVADERS
+
+//Screen dimension constants
+const int SCREEN_WIDTH = 224;
+const int SCREEN_HEIGHT = 256;
+
+//The window we'll be rendering to
+SDL_Window* gWindow = NULL;
+
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
+
+//The window surface
+SDL_Surface* gScreenSurface = NULL;
 
 void loadRom(char * file, int offset){
 	FILE *ROM;
@@ -54,7 +70,7 @@ void emulateCycle(){
 		break;
 
 	case (0x05) : //DCR B
-		B = B--;
+		B = --B;
 		//Zero flag
 		if (B == 0)
 			Z = 1;
@@ -119,11 +135,11 @@ void emulateCycle(){
 		pc += 2;
 		break;
 
-	case(0x0f) : //RRC TODO
+	case(0x0f) : //RRC
 		//Carry flag
 		unsigned char x;
 		x = A;
-		x << 7; //MAL creo
+		x << 7;
 		if (x == 0x80)
 			CY = 1;
 		else
@@ -179,14 +195,16 @@ void emulateCycle(){
 	case(0x23) : //INX H
 		//HL <- HL + 1
 		//short int numero;
-		numero = H << 8 | L;
+		//numero = H << 8 | L;
+		numero = (H << 8 | L) & 0xFFFF;
 		++numero;
-		L = numero;
+		//L = numero;
+		L = numero & 0xFFFF;
 		H = numero >> 8;
 		pc += 1;
 		break;
 
-	case(0x26) : //MVI H,D8 TODO MAAAAAL
+	case(0x26) : //MVI H,D8
 		H = opcode[1];
 		pc += 2;
 		break;
@@ -261,7 +279,7 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0x77) : //MOV M,A TODO ESTA MAL
+	case(0x77) : //MOV M,A
 		//(HL) <- A
 		memory[(H << 8) | L] = A;
 		pc += 1;
@@ -343,7 +361,7 @@ void emulateCycle(){
 		pc += 1;
 		break;
 
-	case(0xc2) : //JNZ adr TODO MAL
+	case(0xc2) : //JNZ adr
 		//if NZ, PC <- adr
 		if (Z == 0)
 			pc = (opcode[1] | (opcode[2] << 8));
@@ -399,13 +417,11 @@ void emulateCycle(){
 		sp += 2;
 		break;
 
-	case(0xcd) : //CALL - TODO MIRAR PORQUE ES ASI y sigue sin funcionar perfecto
+	case(0xcd) : //CALL
 		//(SP-1)<-PC.hi;(SP-2)<-PC.lo;SP<-SP+2;PC=adr
 		short int ret;
-		ret = pc + 3; //Creo que es 3 pero no estoy seguro
-		//memory[sp - 1] = pc >> 8; //MAL 
+		ret = pc + 3;
 		memory[sp - 1] = (ret >> 8) & 0xff;
-		//memory[sp - 2] = pc; //MAL 
 		memory[sp - 2] = (ret & 0xff);
 		sp = sp - 2;
 		pc = (opcode[2] << 8) | opcode[1];
@@ -525,11 +541,11 @@ void emulateCycle(){
 		//A - data
 		char unsigned res;
 		//Carry flag
-		if (A > (0xFFFF - opcode[1]))
+		if (A < (opcode[1]))
 			CY = 1;
 		else
 			CY = 0;
-		CY = 0; //Carry bit is reset to zero
+		//CY = 0; //Carry bit is reset to zero
 		res = A - opcode[1];
 		//Zero flag
 		if (res == 0)
@@ -549,26 +565,138 @@ void emulateCycle(){
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 2;
 		break;
+
+	default:
+		printf("ERROR");
+		exit(0);
 	}
 
 }
 
+bool init()
+{
+	//Initialization flag
+	bool success = true;
+
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+		success = false;
+	}
+	else
+	{
+		//Set texture filtering to linear
+		if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+		{
+			printf("Warning: Linear texture filtering not enabled!");
+		}
+
+		//Create window
+		gWindow = SDL_CreateWindow("CHIP8-Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if (gWindow == NULL)
+		{
+			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+			success = false;
+		}
+		else
+		{
+			//Create renderer for window
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (gRenderer == NULL)
+			{
+				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+				success = false;
+			}
+			else
+			{
+				//Initialize renderer color
+				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+				//Custom
+				gScreenSurface = SDL_GetWindowSurface(gWindow);
+			}
+		}
+	}
+
+	return success;
+}
+
+void draw(){
+
+	static Uint32 lastframe = 0;
+	//static Uint8 frames = FRAMESKIP;
+	Uint32 pixel;
+	Uint32 curframe;
+	Uint16 i;
+	Uint32 *bits;
+	Uint8 j;
+
+	//memset(gScreenSurface->pixels, 0, SCREEN_HEIGHT*gScreenSurface->pitch);
+	pixel = SDL_MapRGB(gScreenSurface->format, 0xFF, 0xFF, 0xFF);
+
+	SDL_LockSurface(gScreenSurface);
+	for (i = 0x2400; i < 0x3fff; i++){
+		if (memory[i] != 0){
+			for (j = 0; j < 8; j++){
+				if ((memory[i] & (1 << j)) != 0){
+					bits = (Uint32 *)gScreenSurface->pixels + ((255 - 1 - (((i % 0x20) << 3) + j)) * (gScreenSurface->w)) + (i >> 5);
+					*bits = pixel;
+				}
+			}
+		}
+	}
+	SDL_UnlockSurface(gScreenSurface);
+	//SDL_RenderPresent(gRenderer);
+	SDL_UpdateWindowSurface(gWindow);
+
+	/*
+		//CleanUp(0);
+	}
+
+	//Clear screen
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
+	SDL_RenderClear(gRenderer);
+	int chgline = 0;
+	int chgcol = 0;
+	//Render red filled quad
+	for (int i = 0x2400; i < 0x3fff; i++){
+		if ((i % 224) == 0){
+			chgline += 1;
+			chgcol = 0;
+		}
+		if (memory[i] == 1){
+			SDL_Rect fillRect = { chgcol, chgline, 1, 1 };
+			SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+			SDL_RenderFillRect(gRenderer, &fillRect);
+		}
+		chgcol += 1;
+	}
+	//Update screen
+	SDL_RenderPresent(gRenderer);
+	*/
+}
+
 int main(int argc, char* argv[]){
 	//Load ROMs
-	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.h", 0);
-	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.g", 0x800);
-	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.f", 0x1000);
-	loadRom("D:\\Users\\Hugo\\Downloads\\invaders\\invaders.e", 0x1800);
+	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.h", 0);
+	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.g", 0x800);
+	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.f", 0x1000);
+	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.e", 0x1800);
 	pc = 0x0;
 	sp = 0xf000;
 	int hugo = 0;
 	int veces = 0;
-	while (hugo == 0){ //Falla entre 42434 falla pc creo
+	init();
+	while (hugo == 0){ //Falla entre 42434 falla pc creo - ESTAN MAL LOS CARRY CREO //37513
 		emulateCycle();
 		veces++;
-		if (veces == 42433){
+		
+		if (veces == 37513){
 			printf("Hugo");
 		}
+		//if (veces%100==0)
+			draw();
 	}
 	return 0;
 }
