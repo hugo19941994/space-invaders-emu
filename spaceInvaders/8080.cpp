@@ -4,6 +4,14 @@
 #include <memory.h>
 #include "SDL_endian.h"
 //TODO DISSASSEMBLER
+
+//Debugging purposes
+int veces = 0;
+
+//Refresh rate
+int refresh = 60 / 2048000; //TODO Interrupts
+//Interrupts: $cf (RST 8) at the start of vblank, $d7 (RST $10) at the end of vblank.
+
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
 short int sp, pc; //16 bit stack pointer, program counter
@@ -11,12 +19,12 @@ unsigned char memory[8192*3]; //64kilobytes of memory, each bank is 1 byte creo 
 //unsigned char *memory; //64kilobytes of memory, each bank is 1 byte
 
 //PSW
-//F - Status register ... Not used
+//F - Status register ... Not used in Space Invaders
 unsigned char Z;//Zero flag
 unsigned char S;//Sign flag
 unsigned char P;//Parity flag
 unsigned char CY;//Carry flag
-unsigned char AC;//Auxiliary carry flag NOT USED IN SPACE INVADERS
+unsigned char AC;//Auxiliary carry flag ... Not used in Space Invaders
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 224;
@@ -57,6 +65,11 @@ void emulateCycle(){
 	short int address;
 	short int numero;
 
+	if (memory[0x20c0] == 0x40)
+		printf("STOP");
+	unsigned char opcode2 = *opcode;
+	if (opcode2 == 1)
+		printf("STOP");
 	switch (*opcode){
 		//ONLY SPACE INVADERS OPCODES IMPLEMENTED
 	case (0x00) : //NOP
@@ -371,7 +384,6 @@ void emulateCycle(){
 
 	case(0xc3) ://JMP adr
 		//short int address;
-		//address = (opcode[1]<<4) | (opcode[2]);
 		address = (opcode[1] | opcode[2] << 8);
 		pc = address;
 		break;
@@ -439,7 +451,7 @@ void emulateCycle(){
 		//outputDevice[opcode[1]] = A;
 		pc += 2;
 		break;
-
+		 
 	case(0xd5) : //PUSH D
 		memory[sp - 2] = E;
 		memory[sp - 1] = D;
@@ -640,7 +652,7 @@ void draw(){
 		if (memory[i] != 0){
 			for (j = 0; j < 8; j++){
 				if ((memory[i] & (1 << j)) != 0){
-					bits = (Uint32 *)gScreenSurface->pixels + ((255 - 1 - (((i % 0x20) << 3) + j)) * (gScreenSurface->w)) + (i >> 5);
+					bits = (Uint32 *)gScreenSurface->pixels + ((256 - (((i % 0x20) << 3) + j)) * (gScreenSurface->w)) + (i >> 5)-64;
 					*bits = pixel;
 				}
 			}
@@ -686,13 +698,13 @@ int main(int argc, char* argv[]){
 	pc = 0x0;
 	sp = 0xf000;
 	int hugo = 0;
-	int veces = 0;
+//	int veces = 0;
 	init();
 	while (hugo == 0){ //Falla entre 42434 falla pc creo - ESTAN MAL LOS CARRY CREO //37513
 		emulateCycle();
 		veces++;
 		
-		if (veces == 37513){
+		if (veces == 42433){
 			printf("Hugo");
 		}
 		//if (veces%100==0)
