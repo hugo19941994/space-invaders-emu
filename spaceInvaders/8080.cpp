@@ -7,10 +7,12 @@
 
 //Debugging purposes
 int veces = 0;
+int cycles = 0;
 
 //Refresh rate
-int refresh = 60 / 2048000; //TODO Interrupts
-//Interrupts: $cf (RST 8) at the start of vblank, $d7 (RST $10) at the end of vblank.
+int refresh = 2000000/60; //TODO Interrupts
+//Interrupts: $cf (RST 0x08) at the start of vblank, $d7 (RST 0x10) at the end of vblank.
+int INT = 0; //Interrupts enabled flag
 
 unsigned char A; //Accumulator 8bit
 unsigned char B, C, D, E, H, L; //General purpose registers 8bits
@@ -64,22 +66,20 @@ void emulateCycle(){
 	short int operando1, operando2, result;
 	short int address;
 	short int numero;
+	int ref;
 
-	if (memory[0x20c0] == 0x40)
-		printf("STOP");
-	unsigned char opcode2 = *opcode;
-	if (opcode2 == 1)
-		printf("STOP");
 	switch (*opcode){
 		//ONLY SPACE INVADERS OPCODES IMPLEMENTED
 	case (0x00) : //NOP
 		pc += 1;
+		cycles += 4;
 		break;
 
 	case (0x01) : //LXI B,D16
 		C = opcode[1];
 		B = opcode[2];
 		pc += 3; //CREO QUE ES 3
+		cycles += 10;
 		break;
 
 	case (0x05) : //DCR B
@@ -101,11 +101,13 @@ void emulateCycle(){
 			P = 0;
 		//Auxiliary Carry - NOT IMPLEMENTED
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case (0x06) : //MVI B, D8
 		B = opcode[1];
 		pc += 2;
+		cycles += 7;
 		break;
 
 	case(0x09) : //DAD B
@@ -120,6 +122,7 @@ void emulateCycle(){
 		if (operando1 > (0xFFFF - operando2))
 			CY = 1;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0x0d) : //DCR C
@@ -141,30 +144,41 @@ void emulateCycle(){
 			P = 0;
 		//Auxiliary Carry - NOT IMPLEMENTED
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case (0x0e) : //MVI C,D8
 		C = opcode[1];
 		pc += 2;
+		cycles += 7;
 		break;
 
-	case(0x0f) : //RRC
+	case(0x0f) : //RRC MAL
 		//Carry flag
 		unsigned char x;
 		x = A;
-		x << 7;
-		if (x == 0x80)
+		//OLD WAY
+		//x = A;
+		//x = x << 7; //Antes era x << 7
+		//if (x == 0x80)
+			//CY = 1;
+		//else
+			//CY = 0;
+		//A = A >> 1;
+		A = ((x & 1) << 7) | (x >> 1);
+		if ((x & 1) == 1)
 			CY = 1;
 		else
 			CY = 0;
-		A = A >> 1;
 		pc += 1;
+		cycles += 4;
 		break;
 
 	case(0x11) : //LXI D, D16
 		E = opcode[1];
 		D = opcode[2];
 		pc += 3;
+		cycles += 10;
 		break;
 
 	case(0x13) ://INX D
@@ -175,6 +189,7 @@ void emulateCycle(){
 		E = numero;
 		D = numero >> 8;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x19) ://DAD D
@@ -189,6 +204,7 @@ void emulateCycle(){
 		if (operando1 > (0xFFFF - operando2))
 			CY = 1;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0x1a) : //LDAX D
@@ -197,12 +213,14 @@ void emulateCycle(){
 		direccion = D << 8 | E;
 		A = memory[direccion];
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0x21) : //LXI H,D16
 		L = opcode[1];
 		H = opcode[2];
 		pc += 3;
+		cycles += 10;
 		break;
 
 	case(0x23) : //INX H
@@ -215,11 +233,13 @@ void emulateCycle(){
 		L = numero & 0xFFFF;
 		H = numero >> 8;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x26) : //MVI H,D8
 		H = opcode[1];
 		pc += 2;
+		cycles += 7;
 		break;
 
 	case(0x29) : //DAD H
@@ -233,6 +253,7 @@ void emulateCycle(){
 		if (operando1 > (0xFFFF - operando1))
 			CY = 1;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0x31) : //LXI SP, D16
@@ -241,12 +262,14 @@ void emulateCycle(){
 		hi = opcode[2];
 		sp = hi << 8 | lo;
 		pc += 3;
+		cycles += 10;
 		break;
 
 	case(0x32) : //STA adr
 		//(adr) <- A
 		memory[opcode[1] | (opcode[2] << 8)] = A;
 		pc += 3;
+		cycles += 13;
 		break;
 
 	case(0x36) : //MVI M,D8
@@ -255,67 +278,79 @@ void emulateCycle(){
 		address = (H << 8) | L;
 		memory[address] = opcode[1];
 		pc += 2;
+		cycles += 10;
 		break;
 
 	case(0x3a) : //LDA adr
 		//A <- (adr)
 		A = memory[opcode[1] | (opcode[2] << 8)];
 		pc += 3;
+		cycles += 13;
 		break;
 
 	case(0x3e) : //MVI A,D8
 		//A <- byte 2
 		A = opcode[1];
 		pc += 2;
+		cycles += 7;
 		break;
 
 	case(0x56) : //MOV D,M
 		//D <- (HL)
 		D = memory[(H << 8) | L];
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0x5e) : //MOV E,M
 		//E <- (HL)
 		E = memory[(H << 8) | L];
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0x66) : //MOV H,M
 		//H <-(HL)
 		H = memory[(H << 8) | L];
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0x6f) : //MOV L,A
 		L = A;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x77) : //MOV M,A
 		//(HL) <- A
 		memory[(H << 8) | L] = A;
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0x7a) : //MOV A,D
 		A = D;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x7b) : //MOV A,E
 		A = E;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x7c) : //MOV A,H
 		A = H;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0x7e) : //MOV A,M
 		A = memory[(H << 8) | L];
 		pc += 1;
+		cycles += 7;
 		break;
 
 	case(0xa7) : //ANA A
@@ -340,6 +375,7 @@ void emulateCycle(){
 		CY = 0; //Carry bit is reset to zero
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 1;
+		cycles += 4;
 		break;
 
 	case(0xaf) : //XRA A
@@ -364,6 +400,7 @@ void emulateCycle(){
 		CY = 0; //Carry bit is reset to zero
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 1;
+		cycles += 4;
 		break;
 
 	case(0xc1) : //POP B
@@ -372,6 +409,7 @@ void emulateCycle(){
 		B = memory[sp + 1];
 		sp += 2;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0xc2) : //JNZ adr
@@ -380,12 +418,14 @@ void emulateCycle(){
 			pc = (opcode[1] | (opcode[2] << 8));
 		else
 			pc += 3;
+		cycles += 10;
 		break;
 
 	case(0xc3) ://JMP adr
 		//short int address;
 		address = (opcode[1] | opcode[2] << 8);
 		pc = address;
+		cycles += 10;
 		break;
 
 	case(0xc5) : //PUSH B
@@ -394,6 +434,7 @@ void emulateCycle(){
 		memory[sp - 1] = B;
 		sp = sp - 2;
 		pc += 1;
+		cycles += 11;
 		break;
 
 	case(0xc6) : //ADI D8
@@ -421,12 +462,14 @@ void emulateCycle(){
 			P = 0;
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 2;
+		cycles += 7;
 		break;
 
 	case(0xc9) : //RET
 		//PC.lo <- (sp); PC.hi<-(sp+1); SP <- SP+2
 		pc = memory[(sp + 1)] << 8 | memory[sp];
 		sp += 2;
+		cycles += 10;
 		break;
 
 	case(0xcd) : //CALL
@@ -437,6 +480,7 @@ void emulateCycle(){
 		memory[sp - 2] = (ret & 0xff);
 		sp = sp - 2;
 		pc = (opcode[2] << 8) | opcode[1];
+		cycles += 17;
 		break;
 
 	case (0xd1) : //POP D
@@ -445,11 +489,13 @@ void emulateCycle(){
 		D = memory[sp + 1];
 		sp = sp + 2;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0xd3) : //OUT D8
 		//outputDevice[opcode[1]] = A;
 		pc += 2;
+		cycles += 10;
 		break;
 		 
 	case(0xd5) : //PUSH D
@@ -457,6 +503,7 @@ void emulateCycle(){
 		memory[sp - 1] = D;
 		sp = sp - 2;
 		pc += 1;
+		cycles += 11;
 		break;
 
 	case(0xe1) : //POP H
@@ -464,6 +511,7 @@ void emulateCycle(){
 		H = memory[sp + 1];
 		sp = sp + 2;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0xe5) : //PUSH H
@@ -472,6 +520,7 @@ void emulateCycle(){
 		memory[sp - 1] = H;
 		sp = sp - 2;
 		pc += 1;
+		cycles += 11;
 		break;
 
 	case(0xe6) : //ANI D8
@@ -496,6 +545,7 @@ void emulateCycle(){
 		CY = 0; //Carry bit is reset to zero
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 2;
+		cycles += 7;
 		break;
 
 	case(0xeb) ://XCHG
@@ -508,11 +558,12 @@ void emulateCycle(){
 		L = E;
 		E = hold;
 		pc += 1;
+		cycles += 5;
 		break;
 
 	case(0xf1) : //POP PSW
 		//flags <- (sp); A <- (sp+1); sp <- sp+2
-		//FLAGS = memory[sp];
+		//FLAGS = memory[sp]; //TODO creo que aqui falla pone el sp mal
 		S = (memory[sp] << 7) & 0x01;
 		Z = (memory[sp] << 6) & 0x01;
 		AC = (memory[sp] << 4) & 0x01;
@@ -521,6 +572,7 @@ void emulateCycle(){
 		A = memory[sp + 1];
 		sp = sp + 2;
 		pc += 1;
+		cycles += 10;
 		break;
 
 	case(0xf5) : //PUSH PSW
@@ -542,11 +594,14 @@ void emulateCycle(){
 		memory[sp - 1] = A;
 		sp = sp - 2;
 		pc += 1;
+		cycles += 11;
 		break;
 
 	case(0xfb) : //EI TODO
 		//Enable interrupts
+		INT = 1;
 		pc += 1;
+		cycles += 4;
 		break;
 
 	case(0xfe) : //CPI D8
@@ -576,13 +631,78 @@ void emulateCycle(){
 			P = 0;
 		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 2;
+		cycles += 7;
+		break;
+
+	case(0x35) ://NO DEBERIA OCURRIR
+		//DCR M
+		ref = memory[H << 8 | L];
+		ref = ref-1;
+		//ref2 = ref2 - 1;
+		memory[H << 8 | L] = ref;
+		//Zero flag
+		if (memory[H << 8 | L] == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((memory[H << 8 | L] & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (memory[H << 8 | L] % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary Carry - NOT IMPLEMENTED
+		pc += 1;
+		cycles += 10;
+		break;
+
+	case(0xdb) : //IN para input
+		cycles += 10;
+		pc += 1;
 		break;
 
 	default:
 		printf("ERROR");
-		exit(0);
+		cycles += 4;
+		//pc = pc + 1;
+		//exit(0);
 	}
 
+}
+
+int interruptExecute(int opcode){
+
+	short int rethugo = pc + 2;
+
+	switch (opcode){
+		case(0xcf) : //RST algo //11xxx111 001
+			//short int ret = pc + 2;
+			memory[sp - 1] = (rethugo >> 8) & 0xff;
+			memory[sp - 2] = rethugo & 0xff;
+			//memory[sp - 2] = pc >> 8;
+			//memory[sp - 1] = pc & 0xFF;
+			sp = sp - 2;
+			pc = 0x08;
+			cycles += 11;
+			break;
+
+		case(0xd7) : //RST algo //010 11xxx111
+			//short int ret = pc + 2;
+			memory[sp - 1] = (rethugo >> 8) & 0xff;
+			memory[sp - 2] = rethugo & 0xff;
+			//memory[sp - 2] = pc >> 8;
+			//memory[sp - 1] = pc & 0xFF;
+			sp = sp - 2;
+			pc = 0x10;
+			cycles += 11;
+			break;
+	}
+
+	return 0;
 }
 
 bool init()
@@ -639,7 +759,7 @@ void draw(){
 	static Uint32 lastframe = 0;
 	//static Uint8 frames = FRAMESKIP;
 	Uint32 pixel;
-	Uint32 curframe;
+	//Uint32 curframe;
 	Uint16 i;
 	Uint32 *bits;
 	Uint8 j;
@@ -661,54 +781,35 @@ void draw(){
 	SDL_UnlockSurface(gScreenSurface);
 	//SDL_RenderPresent(gRenderer);
 	SDL_UpdateWindowSurface(gWindow);
-
-	/*
-		//CleanUp(0);
-	}
-
-	//Clear screen
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-	SDL_RenderClear(gRenderer);
-	int chgline = 0;
-	int chgcol = 0;
-	//Render red filled quad
-	for (int i = 0x2400; i < 0x3fff; i++){
-		if ((i % 224) == 0){
-			chgline += 1;
-			chgcol = 0;
-		}
-		if (memory[i] == 1){
-			SDL_Rect fillRect = { chgcol, chgline, 1, 1 };
-			SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-			SDL_RenderFillRect(gRenderer, &fillRect);
-		}
-		chgcol += 1;
-	}
-	//Update screen
-	SDL_RenderPresent(gRenderer);
-	*/
 }
 
 int main(int argc, char* argv[]){
 	//Load ROMs
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.h", 0);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.g", 0x800);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.f", 0x1000);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.e", 0x1800);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders.h", 0);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders.g", 0x800);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders.f", 0x1000);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders.e", 0x1800);
 	pc = 0x0;
 	sp = 0xf000;
 	int hugo = 0;
-//	int veces = 0;
+	int vecestotal = 0;
 	init();
 	while (hugo == 0){ //Falla entre 42434 falla pc creo - ESTAN MAL LOS CARRY CREO //37513
 		emulateCycle();
-		veces++;
-		
-		if (veces == 42433){
+			veces++;
+
+		if (veces == 42430) //despues delinterrupt va al f5 -> BIEN. Pero a es 00 y deberia ser 40 y sp es 23fe y deberia ser 23fc
 			printf("Hugo");
-		}
-		//if (veces%100==0)
+
+		if ((INT == 1) && (cycles >= refresh)){
+			interruptExecute(0x3f);
 			draw();
+			interruptExecute(0xd7);
+			cycles = 0;
+			//veces = 0;
+			//INT = 0;
+		}
+			
 	}
 	return 0;
 }
