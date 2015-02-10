@@ -4,7 +4,7 @@
 #include <memory.h>
 #include "SDL_endian.h"
 //TODO DISSASSEMBLER
-
+void draw();
 //Debugging purposes
 int veces = 0;
 int cycles = 0;
@@ -23,6 +23,8 @@ unsigned char memory[8192*4]; //64kilobytes of memory, each bank is 1 byte creo 
 //Ports
 unsigned char Read1 = 0x01;
 unsigned char Read2 = 0x00;
+short int ShiftRegister = 0x00;
+short int noOfBitsToShift = 0x00;
 
 //PSW
 //F - Status register ... Not used in Space Invaders
@@ -67,10 +69,17 @@ void loadRom(char * file, int offset){
 void emulateCycle(){
 
 	unsigned char *opcode = &memory[pc];
-	short int operando1, operando2, result;
+	int operando1, operando2;
+	short int result;
 	short int address;
 	short int numero;
 	int ref;
+
+	if ((opcode[0] == 0x21) && (opcode[1]==0x10) && (opcode[2]== 0x28))
+		printf("Hygo");
+
+	if (pc == 0x1820)
+		printf("hugo");
 
 	switch (*opcode){
 		//ONLY SPACE INVADERS OPCODES IMPLEMENTED
@@ -123,8 +132,10 @@ void emulateCycle(){
 		H = result >> 8;
 		L = result;
 		//Carry flag
-		if (operando1 > (0xFFFF - operando2))
+		if ((operando1 + operando2 )> 0xFFFF)
 			CY = 1;
+		else
+			CY = 0;
 		pc += 1;
 		cycles += 10;
 		break;
@@ -162,18 +173,19 @@ void emulateCycle(){
 		unsigned char x;
 		x = A;
 		//OLD WAY
-		//x = A;
-		//x = x << 7; //Antes era x << 7
-		//if (x == 0x80)
-			//CY = 1;
-		//else
-			//CY = 0;
-		//A = A >> 1;
-		A = ((x & 1) << 7) | (x >> 1);
-		if ((x & 1) == 1)
+		x = A;
+		x = x << 7; //Antes era x << 7
+		if (x == 0x80)
 			CY = 1;
 		else
 			CY = 0;
+		A = A >> 1;
+		//NEW WAY
+		//A = ((x & 1) << 7) | (x >> 1);
+		//if ((x & 1) == 1)
+		//	CY = 1;
+		//else
+		//	CY = 0;
 		pc += 1;
 		cycles += 4;
 		break;
@@ -190,7 +202,7 @@ void emulateCycle(){
 		//short int numero;
 		numero = (D << 8) | E;
 		++numero;
-		E = numero;
+		E = numero & 0xff;
 		D = numero >> 8;
 		pc += 1;
 		cycles += 5;
@@ -205,8 +217,10 @@ void emulateCycle(){
 		H = result >> 8;
 		L = result;
 		//Carry flag
-		if (operando1 > (0xFFFF - operando2))
+		if ((operando1+ operando2) > 0xFFFF)
 			CY = 1;
+		else
+			CY = 0;
 		pc += 1;
 		cycles += 10;
 		break;
@@ -248,14 +262,16 @@ void emulateCycle(){
 
 	case(0x29) : //DAD H
 		//HL = HL + HL
-		short int operando1, result; //16bit number
+		int operando1, result; //16bit number
 		operando1 = (H << 8) | L;
 		result = operando1 + operando1;
 		H = result >> 8;
 		L = result;
 		//Carry flag
-		if (operando1 > (0xFFFF - operando1))
+		if ((operando1 + operando1) >0xFFFF)
 			CY = 1;
+		else
+			CY = 0;
 		pc += 1;
 		cycles += 10;
 		break;
@@ -271,6 +287,7 @@ void emulateCycle(){
 
 	case(0x32) : //STA adr
 		//(adr) <- A
+		draw();
 		if ((opcode[1] | (opcode[2] << 8)) <= 0x1fff)
 			printf("Error");
 		if ((opcode[1] | (opcode[2] << 8)) == 0x2400)
@@ -519,10 +536,11 @@ void emulateCycle(){
 
 	case(0xd3) : //OUT D8
 		//outputDevice[opcode[1]] = A;
-		//if (opcode[1] == 0x01)
-		//	Read1 = A;
-		//else if (opcode[1] = 0x02)
-		//	Read2 = A;
+		if (opcode[1] == 0x04)
+			ShiftRegister = (ShiftRegister << 8) | A;
+		else if (opcode[1] == 0x02){
+			noOfBitsToShift = A;
+		}
 		pc += 2;
 		cycles += 10;
 		break;
@@ -647,29 +665,49 @@ void emulateCycle(){
 
 	case(0xfe) : //CPI D8
 		//A - data
-		char unsigned res;
-		//Carry flag
-		if (A < (opcode[1]))
+		//char unsigned res;
+		////Carry flag
+		//if (A < (opcode[1]))
+		//	CY = 1;
+		//else
+		//	CY = 0;
+		//res = A - opcode[1];
+		////Zero flag
+		//if (res == 0)
+		//	Z = 1;
+		//else
+		//	Z = 0;
+		////Sign flag
+		//if ((res & 0x80) == 0x80)
+		//	S = 1;
+		//else
+		//	S = 0;
+		////Parity flag
+		//if (res % 2 == 0) //If B has even parity
+		//	P = 1;
+		//else
+		//	P = 0;
+		////Auxiliary flag - NOT IMPLEMENTED
+		if (A < opcode[1])
 			CY = 1;
 		else
 			CY = 0;
-		res = A - opcode[1];
-		//Zero flag
-		if (res == 0)
+		if ((A & 0xF) < (opcode[1] & 0xF))
+			AC = 1;
+		else
+			AC = 0;
+		if (A == opcode[1])
 			Z = 1;
 		else
 			Z = 0;
-		//Sign flag
-		if ((res & 0x80) == 0x80)
+		if ((A - opcode[1]) >> 7)
 			S = 1;
 		else
 			S = 0;
-		//Parity flag
-		if (res % 2 == 0) //If B has even parity
+		if (((A - opcode[1]) % 2) == 0)
 			P = 1;
 		else
 			P = 0;
-		//Auxiliary flag - NOT IMPLEMENTED
 		pc += 2;
 		cycles += 7;
 		break;
@@ -705,6 +743,9 @@ void emulateCycle(){
 			A = Read1;
 		else if (opcode[1] == 0x02)
 			A = Read2;
+		else if (opcode[1] == 0x03)
+			A = (ShiftRegister << noOfBitsToShift) >> 8;
+			//A = ShiftRegister >> noOfBitsToShift;
 		pc += 2;
 		cycles += 10;
 		break;
@@ -717,7 +758,7 @@ void emulateCycle(){
 		}
 		else{
 			cycles += 5;
-			pc += 2;
+			pc += 1;//was 2
 		}
 		break;
 
@@ -736,7 +777,6 @@ void emulateCycle(){
 		}
 		else
 			pc += 3;
-
 		cycles += 10;
 		break;
 
@@ -924,9 +964,9 @@ void emulateCycle(){
 		//BC <- BC + 1
 		//short int numero;
 		numero = (B << 8) | C;
-		++numero;
+		numero=numero + 1;
 		B = numero >> 8;
-		C = numero;
+		C = numero & 0xff;
 		pc += 1;
 		cycles += 5;
 		break;
@@ -975,7 +1015,7 @@ void emulateCycle(){
 		break;
 
 	case(0xb6) : //ORA M
-		A = A ^ (memory[(H<<8) | L]);
+		A = A | (memory[(H<<8) | L]);
 		//Zero flag
 		if (A == 0)
 			Z = 1;
@@ -999,7 +1039,335 @@ void emulateCycle(){
 
 	//case(0x9a) : //SBB D TODO 
 		//break;
-		
+
+	case(0x46) ://MOV BM
+		B = memory[(H << 8) | L];
+		cycles += 7;
+		pc += 1;
+		break;
+
+	case(0xb0) : //ORA B
+		A = A | B;
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary Carry - NOT IMPLEMENTED
+		CY = 0; //Carry bit reset
+		pc += 1;
+		cycles += 7;
+		break;
+
+	case(0x79)://MOV AC
+		A = C;
+		cycles += 7;
+		pc += 1;
+		break;
+
+	case(0xe3) : //XTHL
+		//L <-> (sp); H <-> (sp+1)
+		unsigned char temp;
+		temp = L;
+		L = memory[sp];
+		memory[sp] = temp;
+		temp = H;
+		H = memory[sp + 1];
+		memory[sp + 1] = temp;
+		pc += 1;
+		cycles += 18;
+		break;
+
+	case(0xe9) ://PCHL
+		pc = (H<<8) | L;
+		cycles += 1;
+		break;
+
+	case(0xa8) : //XRA B
+		//A <-A ^ B
+		A = A ^ B;
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Carry flag
+		CY = 0; //Carry bit is reset to zero
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 1;
+		cycles += 4;
+		break;
+
+	case(0xc0) : //RNZ
+		if (Z == 0){
+			pc = ((memory[(sp + 1)] << 8) | memory[sp]);
+			cycles += 11;
+			sp += 2;
+		}
+		else{
+			cycles += 5;
+			pc += 1;
+		}
+		break;
+
+	case(0xd0) : //RNC
+		if (C == 0){
+			pc = ((memory[(sp + 1)] << 8) | memory[sp]);
+			cycles += 11;
+			sp += 2;
+		}
+		else{
+			cycles += 5;
+			pc += 1;
+		}
+		break;
+
+	case(0x2b) : //DCX H
+		short int temp1;
+		temp1 = (H << 8) | L;
+		temp1--;
+		H = temp1 >> 8;
+		L = temp1 & 0xFF;
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0x78) : //MOV AB
+		A = B;
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0xd6) ://SUI d8
+		A = A - opcode[1];
+		//Carry flag
+		if (A < (opcode[1]))
+			CY = 1;
+		else
+			CY = 0;
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 2;
+		cycles += 7;
+		break;
+
+	case(0x07) : //RLC //MIRAR pq no se si esta bien
+		CY = A >> 7;
+		A = A << 1;
+		A += CY;
+		pc += 1;
+		cycles += 4;
+		break;
+
+	case(0x16) : //MVI D d8
+		D = opcode[1];
+		pc += 2;
+		cycles += 7;
+		break;
+
+	case(0xc4) ://CNZ a16
+		if (Z == 0){
+			short int retu;
+			retu = pc + 3; //was pc+=3 which was bad i think
+			memory[sp - 1] = (retu >> 8) & 0xff;
+			memory[sp - 2] = (retu & 0xff);
+			sp = sp - 2;
+			pc = (opcode[2] << 8) | opcode[1];
+			cycles += 17;
+		}
+		else{
+			pc += 3;
+			cycles += 11;
+		}
+		break;
+
+	case(0x1f) ://RAR //mirar pq quizas esta mal
+		int CY2;
+		CY2 = CY;
+		CY = A & 1;
+		A = A >> 1;
+		A += CY2;
+		pc += 1;
+		cycles += 4;
+		break;
+
+	case(0xf6) ://ORI d8
+		//Carry flag
+		if (A > (0xFF - opcode[1]))
+			CY = 1;
+		else
+			CY = 0;
+		A = A | opcode[1];
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 2;
+		cycles += 7;
+		break;
+
+	case(0x04) : //INR B
+		B++;
+		//Zero flag
+		if (B == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((B & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (B % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0x70): //MOV MB
+		memory[(H << 8) | L] = B;
+		pc += 1;
+		cycles += 7;
+		break;
+
+	case(0xb4)://ORA H
+		A = A | H;
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary Carry - NOT IMPLEMENTED
+		CY = 0; //Carry bit reset
+		pc += 1;
+		cycles += 7;
+		break;
+
+	case(0x3c): //INR A
+		A++;
+		//Zero flag
+		if (A == 0)
+			Z = 1;
+		else
+			Z = 0;
+		//Sign flag
+		if ((A & 0x80) == 0x80)
+			S = 1;
+		else
+			S = 0;
+		//Parity flag
+		if (A % 2 == 0) //If B has even parity
+			P = 1;
+		else
+			P = 0;
+		//Auxiliary flag - NOT IMPLEMENTED
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0xcc)://CZ a16
+		if (Z == 1){
+			short int retur;
+			retur = pc + 3; //was pc+=3 which was bad i think
+			memory[sp - 1] = (retur >> 8) & 0xff;
+			memory[sp - 2] = (retur & 0xff);
+			sp = sp - 2;
+			pc = (opcode[2] << 8) | opcode[1];
+			cycles += 17;
+		}
+		else{
+			pc += 3;
+			cycles += 11;
+		}
+		break;
+
+	case(0xfa) ://JM a16
+		if (S == 1){ //creo que es asi pero asegurarse
+			pc = (opcode[1] | (opcode[2] << 8));
+		}
+		else
+			pc += 3;
+		cycles += 10;
+		break;
+
+	case(0x68): //MOV LB
+		L = B;
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0x61): //MOV HC
+		H = C;
+		pc += 1;
+		cycles += 5;
+		break;
+
+	case(0xde) : //SBI d8
+		//TODO
+		pc += 2;
+		cycles += 7;
+		break;
+
 	default:
 		printf("ERROR");
 		cycles += 4;
@@ -1128,10 +1496,10 @@ void draw(){
 
 int main(int argc, char* argv[]){
 	//Load ROMs
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.h", 0);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.g", 0x800);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.f", 0x1000);
-	loadRom("D:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.e", 0x1800);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.h", 0);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.g", 0x800);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.f", 0x1000);
+	loadRom("C:\\Users\\Hugo\\Downloads\\emulators\\invaders\\invaders.e", 0x1800);
 	pc = 0x0;
 	sp = 0xf000;
 	int hugo = 0;
@@ -1141,9 +1509,6 @@ int main(int argc, char* argv[]){
 	while (hugo == 0){
 		emulateCycle();
 		veces++;
-
-		if (veces == 0x0013c0a4)
-			printf("Hugo");
 
 		if ((INT == 1) && (cycles >= refresh)) {
 
@@ -1159,9 +1524,10 @@ int main(int argc, char* argv[]){
 				INT = 0;
 			}
 			draw();
-			SDL_Delay(10);
+			SDL_Delay(5);
 			cycles = 0;
 		}
+
 	}
 	return 0;
 }
