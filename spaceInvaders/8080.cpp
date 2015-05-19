@@ -90,7 +90,7 @@ void emulateCycle(){
 	int result;
 
 	switch (*opcode){ //ONLY SPACE INVADERS OPCODES IMPLEMENTED
-		
+
 	case (0x00) : //NOP
 		pc += 1;
 		cycles += 4;
@@ -498,7 +498,7 @@ void emulateCycle(){
 		pc += 2;
 		cycles += 10;
 		break;
-		 
+
 	case(0xd5) : //PUSH D
 		memory[sp - 2] = E;
 		memory[sp - 1] = D;
@@ -860,20 +860,20 @@ void emulateCycle(){
 		cycles += 16;
 		pc += 3;
 		break;
-		
+
 	case(0x0a) : //LDAX B
 		//A <- (BC)
 		A = memory[(B << 8) | C];
 		pc += 1;
 		cycles += 7;
 		break;
-		
+
 	case(0x37) : //STC
 		CY = 1;
 		pc += 1;
 		cycles += 4;
 		break;
-		
+
 	case(0x03) : //INX B
 		//BC <- BC + 1
 		result = ((B << 8) | C) + 1;
@@ -882,7 +882,7 @@ void emulateCycle(){
 		pc += 1;
 		cycles += 5;
 		break;
-		
+
 	case(0x67) : //MOV HA
 		H = A;
 		cycles += 5;
@@ -912,14 +912,13 @@ void emulateCycle(){
 			cycles += 5;
 		}
 		break;
-		
+
 	case(0x4f) : //MOV CA
 		C = A;
-		pc + 1;
 		cycles += 5;
 		pc += 1;
 		break;
-		
+
 	case(0x2e) : //MVI C,d8
 		C = opcode[1];
 		pc += 2;
@@ -1680,4 +1679,3 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 }
-	
