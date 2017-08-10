@@ -1,0 +1,357 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		EF046EB81F3BB94F00B72EDB /* emu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF046EB71F3BB94F00B72EDB /* emu.cpp */; };
+		EF046EBE1F3BB95D00B72EDB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF046EB91F3BB95D00B72EDB /* main.m */; };
+		EF046EBF1F3BB95D00B72EDB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF046EBB1F3BB95D00B72EDB /* ViewController.m */; };
+		EF046EC01F3BB95D00B72EDB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF046EBD1F3BB95D00B72EDB /* AppDelegate.m */; };
+		EF046EC41F3BB97600B72EDB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC21F3BB97600B72EDB /* Main.storyboard */; };
+		EF046EC81F3BB98400B72EDB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC51F3BB98400B72EDB /* Assets.xcassets */; };
+		EF046EC91F3BB98400B72EDB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC71F3BB98400B72EDB /* Info.plist */; };
+		EF046ECB1F3BBA3800B72EDB /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECA1F3BBA3800B72EDB /* SDL2.framework */; };
+		EF046ECF1F3BBA6600B72EDB /* libzip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECE1F3BBA6600B72EDB /* libzip.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		EF046EB61F3BB94F00B72EDB /* emu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emu.hpp; path = src/emu.hpp; sourceTree = "<group>"; };
+		EF046EB71F3BB94F00B72EDB /* emu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emu.cpp; path = src/emu.cpp; sourceTree = "<group>"; };
+		EF046EB91F3BB95D00B72EDB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = xcode/main.m; sourceTree = "<group>"; };
+		EF046EBA1F3BB95D00B72EDB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = xcode/AppDelegate.h; sourceTree = "<group>"; };
+		EF046EBB1F3BB95D00B72EDB /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = xcode/ViewController.m; sourceTree = "<group>"; };
+		EF046EBC1F3BB95D00B72EDB /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = xcode/ViewController.h; sourceTree = "<group>"; };
+		EF046EBD1F3BB95D00B72EDB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = xcode/AppDelegate.m; sourceTree = "<group>"; };
+		EF046EC31F3BB97600B72EDB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = xcode/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		EF046EC51F3BB98400B72EDB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = xcode/Assets.xcassets; sourceTree = "<group>"; };
+		EF046EC61F3BB98400B72EDB /* space-invaders.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = "space-invaders.entitlements"; path = "xcode/space-invaders.entitlements"; sourceTree = "<group>"; };
+		EF046EC71F3BB98400B72EDB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = xcode/Info.plist; sourceTree = "<group>"; };
+		EF046ECA1F3BBA3800B72EDB /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = xcode/SDL2.framework; sourceTree = "<group>"; };
+		EF046ECE1F3BBA6600B72EDB /* libzip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libzip.framework; path = xcode/libzip.framework; sourceTree = "<group>"; };
+		EFC4909C1F377EA20006F3AF /* space-invaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "space-invaders.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EFC490991F377EA20006F3AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF046ECF1F3BBA6600B72EDB /* libzip.framework in Frameworks */,
+				EF046ECB1F3BBA3800B72EDB /* SDL2.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EF046EB51F3BB94500B72EDB /* src */ = {
+			isa = PBXGroup;
+			children = (
+				EF046EBA1F3BB95D00B72EDB /* AppDelegate.h */,
+				EF046EBD1F3BB95D00B72EDB /* AppDelegate.m */,
+				EF046EB91F3BB95D00B72EDB /* main.m */,
+				EF046EBC1F3BB95D00B72EDB /* ViewController.h */,
+				EF046EBB1F3BB95D00B72EDB /* ViewController.m */,
+				EF046EB71F3BB94F00B72EDB /* emu.cpp */,
+				EF046EB61F3BB94F00B72EDB /* emu.hpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		EF046EC11F3BB96300B72EDB /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				EF046EC51F3BB98400B72EDB /* Assets.xcassets */,
+				EF046EC71F3BB98400B72EDB /* Info.plist */,
+				EF046EC61F3BB98400B72EDB /* space-invaders.entitlements */,
+				EF046EC21F3BB97600B72EDB /* Main.storyboard */,
+			);
+			name = resources;
+			sourceTree = "<group>";
+		};
+		EFC490931F377EA20006F3AF = {
+			isa = PBXGroup;
+			children = (
+				EF046EC11F3BB96300B72EDB /* resources */,
+				EF046EB51F3BB94500B72EDB /* src */,
+				EFC4909D1F377EA20006F3AF /* Products */,
+				EFC490B61F377F920006F3AF /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		EFC4909D1F377EA20006F3AF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EFC4909C1F377EA20006F3AF /* space-invaders.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EFC490B61F377F920006F3AF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EF046ECE1F3BBA6600B72EDB /* libzip.framework */,
+				EF046ECA1F3BBA3800B72EDB /* SDL2.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EFC4909B1F377EA20006F3AF /* space-invaders */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EFC490B01F377EA20006F3AF /* Build configuration list for PBXNativeTarget "space-invaders" */;
+			buildPhases = (
+				EFC490981F377EA20006F3AF /* Sources */,
+				EFC490991F377EA20006F3AF /* Frameworks */,
+				EFC4909A1F377EA20006F3AF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "space-invaders";
+			productName = test3;
+			productReference = EFC4909C1F377EA20006F3AF /* space-invaders.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EFC490941F377EA20006F3AF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "Hugo Ferrando Seage";
+				TargetAttributes = {
+					EFC4909B1F377EA20006F3AF = {
+						CreatedOnToolsVersion = 9.0;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 0;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = EFC490971F377EA20006F3AF /* Build configuration list for PBXProject "space-invaders" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = EFC490931F377EA20006F3AF;
+			productRefGroup = EFC4909D1F377EA20006F3AF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EFC4909B1F377EA20006F3AF /* space-invaders */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EFC4909A1F377EA20006F3AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF046EC81F3BB98400B72EDB /* Assets.xcassets in Resources */,
+				EF046EC41F3BB97600B72EDB /* Main.storyboard in Resources */,
+				EF046EC91F3BB98400B72EDB /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EFC490981F377EA20006F3AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF046EC01F3BB95D00B72EDB /* AppDelegate.m in Sources */,
+				EF046EBF1F3BB95D00B72EDB /* ViewController.m in Sources */,
+				EF046EBE1F3BB95D00B72EDB /* main.m in Sources */,
+				EF046EB81F3BB94F00B72EDB /* emu.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		EF046EC21F3BB97600B72EDB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EF046EC31F3BB97600B72EDB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		EFC490AE1F377EA20006F3AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		EFC490AF1F377EA20006F3AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		EFC490B11F377EA20006F3AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "xcode/space-invaders.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					"$(PROJECT_DIR)/xcode",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "hugo.space-invaders";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EFC490B21F377EA20006F3AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "xcode/space-invaders.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					"$(PROJECT_DIR)/xcode",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "hugo.space-invaders";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EFC490971F377EA20006F3AF /* Build configuration list for PBXProject "space-invaders" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EFC490AE1F377EA20006F3AF /* Debug */,
+				EFC490AF1F377EA20006F3AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EFC490B01F377EA20006F3AF /* Build configuration list for PBXNativeTarget "space-invaders" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EFC490B11F377EA20006F3AF /* Debug */,
+				EFC490B21F377EA20006F3AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EFC490941F377EA20006F3AF /* Project object */;
+}
