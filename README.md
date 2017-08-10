@@ -1,4 +1,4 @@
-# SpaceInvaders-Emu
+# space-invaders-emu
 
 An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 
