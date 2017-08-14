@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "emu.hpp"
+#import "connection.h"
 
 int main(int argc, const char * argv[]) {
     return NSApplicationMain(argc, argv);

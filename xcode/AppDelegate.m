@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import "emu.hpp"
+#import "connection.h"
 
 @interface AppDelegate ()
 

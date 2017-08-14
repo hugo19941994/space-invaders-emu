@@ -16,10 +16,11 @@
 		EF046EC91F3BB98400B72EDB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC71F3BB98400B72EDB /* Info.plist */; };
 		EF046ECB1F3BBA3800B72EDB /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECA1F3BBA3800B72EDB /* SDL2.framework */; };
 		EF046ECF1F3BBA6600B72EDB /* libzip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECE1F3BBA6600B72EDB /* libzip.framework */; };
+		EF2A72F81F40E46100D8E002 /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF2A72F71F40E46100D8E002 /* cpu.cpp */; };
+		EF2A73001F41B00B00D8E002 /* dispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		EF046EB61F3BB94F00B72EDB /* emu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emu.hpp; path = src/emu.hpp; sourceTree = "<group>"; };
 		EF046EB71F3BB94F00B72EDB /* emu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emu.cpp; path = src/emu.cpp; sourceTree = "<group>"; };
 		EF046EB91F3BB95D00B72EDB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = xcode/main.m; sourceTree = "<group>"; };
 		EF046EBA1F3BB95D00B72EDB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = xcode/AppDelegate.h; sourceTree = "<group>"; };
@@ -32,6 +33,10 @@
 		EF046EC71F3BB98400B72EDB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = xcode/Info.plist; sourceTree = "<group>"; };
 		EF046ECA1F3BBA3800B72EDB /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = xcode/SDL2.framework; sourceTree = "<group>"; };
 		EF046ECE1F3BBA6600B72EDB /* libzip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libzip.framework; path = xcode/libzip.framework; sourceTree = "<group>"; };
+		EF2A72F71F40E46100D8E002 /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpu.cpp; path = src/cpu.cpp; sourceTree = "<group>"; };
+		EF2A72FA1F40F12500D8E002 /* connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = connection.h; path = src/connection.h; sourceTree = "<group>"; };
+		EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dispatcher.cpp; path = src/dispatcher.cpp; sourceTree = "<group>"; };
+		EF30BCC21F3E36E8009620BA /* emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = emu.h; path = src/emu.h; sourceTree = "<group>"; };
 		EFC4909C1F377EA20006F3AF /* space-invaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "space-invaders.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -51,13 +56,16 @@
 		EF046EB51F3BB94500B72EDB /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */,
+				EF2A72FA1F40F12500D8E002 /* connection.h */,
+				EF2A72F71F40E46100D8E002 /* cpu.cpp */,
+				EF30BCC21F3E36E8009620BA /* emu.h */,
 				EF046EBA1F3BB95D00B72EDB /* AppDelegate.h */,
 				EF046EBD1F3BB95D00B72EDB /* AppDelegate.m */,
 				EF046EB91F3BB95D00B72EDB /* main.m */,
 				EF046EBC1F3BB95D00B72EDB /* ViewController.h */,
 				EF046EBB1F3BB95D00B72EDB /* ViewController.m */,
 				EF046EB71F3BB94F00B72EDB /* emu.cpp */,
-				EF046EB61F3BB94F00B72EDB /* emu.hpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -177,7 +185,9 @@
 			files = (
 				EF046EC01F3BB95D00B72EDB /* AppDelegate.m in Sources */,
 				EF046EBF1F3BB95D00B72EDB /* ViewController.m in Sources */,
+				EF2A73001F41B00B00D8E002 /* dispatcher.cpp in Sources */,
 				EF046EBE1F3BB95D00B72EDB /* main.m in Sources */,
+				EF2A72F81F40E46100D8E002 /* cpu.cpp in Sources */,
 				EF046EB81F3BB94F00B72EDB /* emu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
