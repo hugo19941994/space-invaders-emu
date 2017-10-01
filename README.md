@@ -1,5 +1,8 @@
 # space-invaders-emu
 
+[![Build Status](https://travis-ci.org/hugo19941994/space-invaders-emu.svg?branch=master)](https://travis-ci.org/hugo19941994/space-invaders-emu)
+[![license](https://img.shields.io/github/license/hugo19941994/space-invaders-emu.svg)](https://github.com/hugo19941994/space-invaders-emu/blob/master/LICENSE.md)
+
 An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 
 ![gif](images/preview.gif)
