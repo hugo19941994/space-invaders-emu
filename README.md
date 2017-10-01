@@ -5,8 +5,9 @@ An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 ![gif](images/preview.gif)
 
 ## Dependencies
-* [SDL 2](https://www.libsdl.org/index.php)
 * [libzip](https://nih.at/libzip/)
+* GLFW
+* GLEW
 * C++14 compiler
 
 ## TODO
@@ -15,4 +16,3 @@ An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 * Auxiliary Carry
 * Visual Studio 2017 project
 * Windows & Linux compatiblity
-* Substitute SDL2 with OpenGL

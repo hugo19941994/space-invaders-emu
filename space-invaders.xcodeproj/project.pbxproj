@@ -14,10 +14,9 @@
 		EF046EC41F3BB97600B72EDB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC21F3BB97600B72EDB /* Main.storyboard */; };
 		EF046EC81F3BB98400B72EDB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC51F3BB98400B72EDB /* Assets.xcassets */; };
 		EF046EC91F3BB98400B72EDB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF046EC71F3BB98400B72EDB /* Info.plist */; };
-		EF046ECB1F3BBA3800B72EDB /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECA1F3BBA3800B72EDB /* SDL2.framework */; };
-		EF046ECF1F3BBA6600B72EDB /* libzip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF046ECE1F3BBA6600B72EDB /* libzip.framework */; };
 		EF2A72F81F40E46100D8E002 /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF2A72F71F40E46100D8E002 /* cpu.cpp */; };
 		EF2A73001F41B00B00D8E002 /* dispatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */; };
+		EFD139971F4A1F6900542A78 /* display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EFD139961F4A1F6900542A78 /* display.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +37,8 @@
 		EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dispatcher.cpp; path = src/dispatcher.cpp; sourceTree = "<group>"; };
 		EF30BCC21F3E36E8009620BA /* emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = emu.h; path = src/emu.h; sourceTree = "<group>"; };
 		EFC4909C1F377EA20006F3AF /* space-invaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "space-invaders.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EFD139931F49B5BF00542A78 /* display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = display.h; path = src/display.h; sourceTree = "<group>"; };
+		EFD139961F4A1F6900542A78 /* display.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = display.cpp; path = src/display.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,8 +46,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF046ECF1F3BBA6600B72EDB /* libzip.framework in Frameworks */,
-				EF046ECB1F3BBA3800B72EDB /* SDL2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +55,8 @@
 		EF046EB51F3BB94500B72EDB /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EFD139961F4A1F6900542A78 /* display.cpp */,
+				EFD139931F49B5BF00542A78 /* display.h */,
 				EF2A72FF1F41B00A00D8E002 /* dispatcher.cpp */,
 				EF2A72FA1F40F12500D8E002 /* connection.h */,
 				EF2A72F71F40E46100D8E002 /* cpu.cpp */,
@@ -187,6 +188,7 @@
 				EF046EBF1F3BB95D00B72EDB /* ViewController.m in Sources */,
 				EF2A73001F41B00B00D8E002 /* dispatcher.cpp in Sources */,
 				EF046EBE1F3BB95D00B72EDB /* main.m in Sources */,
+				EFD139971F4A1F6900542A78 /* display.cpp in Sources */,
 				EF2A72F81F40E46100D8E002 /* cpu.cpp in Sources */,
 				EF046EB81F3BB94F00B72EDB /* emu.cpp in Sources */,
 			);
@@ -316,8 +318,25 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 					"$(PROJECT_DIR)/xcode",
 				);
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/glew/2.1.0/include,
+					/usr/local/Cellar/glfw/3.2.1/include,
+					/usr/local/Cellar/glm/0.9.8.4/include,
+					"/usr/local/Cellar/libzip/1.2.0/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/glew/2.1.0/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glm/0.9.8.4/lib,
+					/usr/local/Cellar/libzip/1.2.0/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lglfw",
+					"-lzip",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "hugo.space-invaders";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -333,8 +352,25 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 					"$(PROJECT_DIR)/xcode",
 				);
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/glew/2.1.0/include,
+					/usr/local/Cellar/glfw/3.2.1/include,
+					/usr/local/Cellar/glm/0.9.8.4/include,
+					"/usr/local/Cellar/libzip/1.2.0/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/glew/2.1.0/lib,
+					/usr/local/Cellar/glfw/3.2.1/lib,
+					/usr/local/Cellar/glm/0.9.8.4/lib,
+					/usr/local/Cellar/libzip/1.2.0/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lglfw",
+					"-lzip",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "hugo.space-invaders";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
