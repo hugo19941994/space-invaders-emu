@@ -11,7 +11,7 @@ An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 * [libzip](https://nih.at/libzip/)
 * GLFW
 * GLEW
-* C++14 compiler
+* GLM
 
 ## TODO
 * Refactoring
