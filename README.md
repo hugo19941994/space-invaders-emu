@@ -8,10 +8,12 @@ An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 ![gif](images/preview.gif)
 
 ## Dependencies
+* [GLFW](http://www.glfw.org/)
+* [GLEW](http://glew.sourceforge.net/)
+* [GLM](https://glm.g-truc.net/0.9.8/index.html)
 * [libzip](https://nih.at/libzip/)
-* GLFW
-* GLEW
-* GLM
+
+These can be installed using [Homebrew](https://brew.sh/) in MacOS.
 
 ## TODO
 * Refactoring
