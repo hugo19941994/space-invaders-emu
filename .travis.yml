@@ -2,6 +2,7 @@ os: osx
 osx_image: xcode9
 language: cpp
 before_install:
+  - brew update
   - brew install sdl2 glfw glew libzip glm
 script:
   - xcodebuild -project space-invaders.xcodeproj
