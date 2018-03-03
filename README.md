@@ -8,7 +8,7 @@ An Intel 8080 Emulator capable of playing a Space Invaders ROM written in C++
 
 ## Dependencies
 * [GLFW](http://www.glfw.org/)
-* [GLEW](http://glew.sourceforge.net/)
+* [GLEW](https://github.com/nigels-com/glew)
 * [GLM](https://glm.g-truc.net/0.9.8/index.html)
 * [libzip](https://nih.at/libzip/)
 
