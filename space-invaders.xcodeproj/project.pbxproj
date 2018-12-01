@@ -321,7 +321,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/glew/2.1.0/include,
 					/usr/local/Cellar/glfw/3.2.1/include,
-					/usr/local/Cellar/glm/0.9.9.2/include,
+					/usr/local/Cellar/glm/0.9.9.3/include,
 					"/usr/local/Cellar/libzip/1.5.1/**",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
@@ -329,7 +329,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/glew/2.1.0/lib,
 					/usr/local/Cellar/glfw/3.2.1/lib,
-					/usr/local/Cellar/glm/0.9.9.2/lib,
+					/usr/local/Cellar/glm/0.9.9.3/lib,
 					/usr/local/Cellar/libzip/1.5.1/lib,
 				);
 				OTHER_LDFLAGS = (
@@ -355,7 +355,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/glew/2.1.0/include,
 					/usr/local/Cellar/glfw/3.2.1/include,
-					/usr/local/Cellar/glm/0.9.9.2/include,
+					/usr/local/Cellar/glm/0.9.9.3/include,
 					"/usr/local/Cellar/libzip/1.5.1/**",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/xcode/Info.plist";
@@ -363,7 +363,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/glew/2.1.0/lib,
 					/usr/local/Cellar/glfw/3.2.1/lib,
-					/usr/local/Cellar/glm/0.9.9.2/lib,
+					/usr/local/Cellar/glm/0.9.9.3/lib,
 					/usr/local/Cellar/libzip/1.5.1/lib,
 				);
 				OTHER_LDFLAGS = (
